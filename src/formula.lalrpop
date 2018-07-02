@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use value::Value;
+use ast::{Expr, Opcode};
+use reference::Reference;
 
 grammar;
 
@@ -8,21 +9,31 @@ pub Formula = {
 	Expr
 }
 
-Expr: i64 = {
-    <l:Expr> "+" <r:Factor> => l + r,
-    <l:Expr> "-" <r:Factor> => l - r,
+Expr: Box<Expr> = {
+    Expr ExprOp Factor => Box::new(Expr::Op(<>)),
     Factor,
 };
 
-Factor: i64 = {
-    <l:Factor> "*" <r:Term> => l * r,
-    <l:Factor> "/" <r:Term> => l / r,
+ExprOp: Opcode = {
+    "+" => Opcode::Add,
+    "-" => Opcode::Sub,
+};
+
+Factor: Box<Expr> = {
+    Factor FactorOp Term => Box::new(Expr::Op(<>)),
     Term,
 };
 
-Term: i64 = {
-    Num,
-    "(" <Expr> ")",
+FactorOp: Opcode = {
+    "*" => Opcode::Mul,
+    "/" => Opcode::Div,
+};
+
+Term: Box<Expr> = {
+    Num => Box::new(Expr::Number(<>)),
+    Ref => Box::new(Expr::Reference(<>)),
+    "(" <Expr> ")"
 };
 
 Num: i64 = r"[0-9]+" => i64::from_str(<>).unwrap();
+Ref: Reference = r"[a-zA-Z]+[0-9]+" => Reference::from_str(<>).unwrap();
