@@ -32,8 +32,7 @@ impl Spreadsheet {
     fn enter<T: ToString>(&mut self, reference: Reference, input: T) {
         let input = input.to_string();
         let value = if input.starts_with('=') {
-            let expr = self.formula_parser.parse(&input[1..]);
-            match expr {
+            match self.formula_parser.parse(&input) {
                 Ok(expr) => expr.evaluate(&self.cells),
                 Err(_) => Err(InvalidValue),
             }

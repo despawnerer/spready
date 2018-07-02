@@ -6,7 +6,7 @@ use reference::Reference;
 grammar;
 
 pub Formula = {
-	Expr
+	"=" <Expr>,
 }
 
 Expr: Box<Expr> = {
