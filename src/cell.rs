@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
-use value::{Value, InvalidValue};
 use reference::Reference;
+use value::{InvalidValue, Value};
 
 #[derive(Clone, Debug)]
 pub struct Cell {
@@ -13,7 +13,9 @@ pub struct Cell {
 impl Cell {
     pub fn new(input: String, value: Result<Value, InvalidValue>) -> Cell {
         Cell {
-            input, value, successors: HashSet::new()
+            input,
+            value,
+            successors: HashSet::new(),
         }
     }
 }

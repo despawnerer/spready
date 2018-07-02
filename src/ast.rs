@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use reference::Reference;
-use value::{Value, InvalidValue};
 use cell::Cell;
+use reference::Reference;
+use value::{InvalidValue, Value};
 
 #[derive(Debug, Clone)]
 pub enum Expr {
@@ -20,30 +20,33 @@ pub enum Opcode {
 }
 
 impl Expr {
-	pub fn evaluate(self, cells: &HashMap<Reference, Cell>) -> Result<Value, InvalidValue> {
-		match self {
-			Expr::Number(x) => Ok(Value::Integer(x)),
-			Expr::Reference(x) => cells.get(&x).unwrap().value.clone(),
-			Expr::Op(l, op, r) => {
-				let l = match (*l).evaluate(cells) {
-					Ok(Value::Integer(x)) => x,
-					_ => return Err(InvalidValue),
-				};
+    pub fn evaluate(self, cells: &HashMap<Reference, Cell>) -> Result<Value, InvalidValue> {
+        match self {
+            Expr::Number(x) => Ok(Value::Integer(x)),
+            Expr::Reference(x) => match cells.get(&x) {
+                Some(cell) => cell.value.clone(),
+                None => Ok(Value::Integer(0)),
+            },
+            Expr::Op(l, op, r) => {
+                let l = match (*l).evaluate(cells) {
+                    Ok(Value::Integer(x)) => x,
+                    _ => return Err(InvalidValue),
+                };
 
-				let r = match (*r).evaluate(cells) {
-					Ok(Value::Integer(x)) => x,
-					_ => return Err(InvalidValue),
-				};
+                let r = match (*r).evaluate(cells) {
+                    Ok(Value::Integer(x)) => x,
+                    _ => return Err(InvalidValue),
+                };
 
-				let result = match op {
-					Opcode::Mul => l * r,
-					Opcode::Div => l / r,
-					Opcode::Add => l + r,
-					Opcode::Sub => l - r,
-				};
+                let result = match op {
+                    Opcode::Mul => l * r,
+                    Opcode::Div => l / r,
+                    Opcode::Add => l + r,
+                    Opcode::Sub => l - r,
+                };
 
-				Ok(Value::Integer(result))
-			}
-		}
-	}
+                Ok(Value::Integer(result))
+            }
+        }
+    }
 }

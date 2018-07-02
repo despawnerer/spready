@@ -1,18 +1,20 @@
 extern crate lalrpop_util;
 
+#[cfg_attr(rustfmt, rustfmt_skip)]
 mod formula;
-mod value;
-mod reference;
+
 mod ast;
 mod cell;
+mod reference;
+mod value;
 
 use std::collections::{HashMap, HashSet};
 
-use value::{Value, InvalidValue};
-use reference::{Reference, InvalidReference};
+use ast::Expr;
 use cell::Cell;
 use formula::FormulaParser;
-use ast::Expr;
+use reference::{InvalidReference, Reference};
+use value::{InvalidValue, Value};
 
 // spreadsheet
 
@@ -30,8 +32,10 @@ impl Spreadsheet {
     }
 
     fn enter<R, T>(&mut self, reference: R, input: T)
-    where R: Into<Reference>,
-        T: ToString {
+    where
+        R: Into<Reference>,
+        T: ToString,
+    {
         let reference = reference.into();
         let input = input.to_string();
 
@@ -67,6 +71,7 @@ fn main() {
     spreadsheet.enter("C2", "=A1+A2+A3");
 
     spreadsheet.enter("D1", "=sum(A1:A3)");
+    spreadsheet.enter("D2", "=A4 + 20");
 
     println!("{:?}", spreadsheet.cells);
 }
