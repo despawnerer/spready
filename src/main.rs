@@ -29,8 +29,12 @@ impl Spreadsheet {
         }
     }
 
-    fn enter<T: ToString>(&mut self, reference: Reference, input: T) {
+    fn enter<R, T>(&mut self, reference: R, input: T)
+    where R: Into<Reference>,
+        T: ToString {
+        let reference = reference.into();
         let input = input.to_string();
+
         let value = if input.starts_with('=') {
             match self.formula_parser.parse(&input) {
                 Ok(expr) => expr.evaluate(&self.cells),
@@ -52,17 +56,17 @@ impl Spreadsheet {
 
 fn main() {
     let mut spreadsheet = Spreadsheet::new();
-    spreadsheet.enter("A1".parse().unwrap(), 10);
-    spreadsheet.enter("A2".parse().unwrap(), 20);
-    spreadsheet.enter("A3".parse().unwrap(), 30);
+    spreadsheet.enter("A1", 10);
+    spreadsheet.enter("A2", 20);
+    spreadsheet.enter("A3", 30);
 
-    spreadsheet.enter("B1".parse().unwrap(), "=20");
-    spreadsheet.enter("B2".parse().unwrap(), "=30+50");
+    spreadsheet.enter("B1", "=20");
+    spreadsheet.enter("B2", "=30+50");
 
-    spreadsheet.enter("C1".parse().unwrap(), "=A1*2");
-    spreadsheet.enter("C2".parse().unwrap(), "=A1+A2+A3");
+    spreadsheet.enter("C1", "=A1*2");
+    spreadsheet.enter("C2", "=A1+A2+A3");
 
-    spreadsheet.enter("D1".parse().unwrap(), "=sum(A1:A3)");
+    spreadsheet.enter("D1", "=sum(A1:A3)");
 
     println!("{:?}", spreadsheet.cells);
 }

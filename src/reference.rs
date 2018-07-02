@@ -36,3 +36,9 @@ impl FromStr for Reference {
         Ok(Reference(column, row))
     }
 }
+
+impl<'a> From<&'a str> for Reference {
+    fn from(src: &'a str) -> Reference {
+        src.parse().unwrap()
+    }
+}
