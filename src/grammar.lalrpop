@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use ast::{Expr, Opcode};
+use syntax::{Expr, Opcode};
 use reference::Reference;
 
 grammar;
@@ -30,10 +30,10 @@ FactorOp: Opcode = {
 };
 
 Term: Box<Expr> = {
-    Num => Box::new(Expr::Number(<>)),
+    Int => Box::new(Expr::Integer(<>)),
     Ref => Box::new(Expr::Reference(<>)),
     "(" <Expr> ")"
 };
 
-Num: i64 = r"[0-9]+" => i64::from_str(<>).unwrap();
+Int: i64 = r"[0-9]+" => i64::from_str(<>).unwrap();
 Ref: Reference = r"[a-zA-Z]+[0-9]+" => Reference::from_str(<>).unwrap();

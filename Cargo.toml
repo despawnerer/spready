@@ -2,10 +2,10 @@
 authors = ["Aleksei Voronov <despawn@gmail.com>"]
 name = "spready"
 version = "0.1.0"
-
 [build-dependencies]
 lalrpop = "0.15.2"
 
 [dependencies]
 lalrpop-util = "0.15.2"
+lazy_static = "1.0.1"
 regex = "1.0.1"
