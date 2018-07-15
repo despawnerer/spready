@@ -1,39 +1,32 @@
 use std::str::FromStr;
 
+use arrayvec::ArrayString;
+use regex::Regex;
+
 #[derive(Debug, Clone)]
 pub struct InvalidReference;
 
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Reference(u32, u32);
+pub struct Reference(ArrayString<[u8; 5]>);
 
 impl FromStr for Reference {
     type Err = InvalidReference;
 
     fn from_str(value: &str) -> Result<Reference, InvalidReference> {
-        let maybe_split_point = value.chars().position(|c| !c.is_ascii_alphabetic());
+        lazy_static! {
+            static ref REFERENCE_REGEX: Regex = Regex::new(r"^[a-zA-Z]{1,2}[1-9][0-9]{0,2}$").unwrap();
+        }
 
-        let split_point = match maybe_split_point {
-            None | Some(0) => return Err(InvalidReference),
-            Some(x) => x,
-        };
+        if !REFERENCE_REGEX.is_match(value) {
+            return Err(InvalidReference);
+        }
 
-        let (column_chars, row_chars) = value.split_at(split_point);
-
-        let column = match column_chars {
-            "A" => 1,
-            "B" => 2,
-            "C" => 3,
-            "D" => 4,
-            "E" => 5,
-            _ => return Err(InvalidReference),
-        };
-
-        let row = match row_chars.parse() {
-            Err(_) => return Err(InvalidReference),
+        let value = match ArrayString::from(value) {
             Ok(x) => x,
+            Err(_) => return Err(InvalidReference),
         };
 
-        Ok(Reference(column, row))
+        Ok(Reference(value))
     }
 }
 

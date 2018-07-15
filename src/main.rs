@@ -1,6 +1,8 @@
 extern crate lalrpop_util;
 #[macro_use]
 extern crate lazy_static;
+extern crate arrayvec;
+extern crate regex;
 
 mod evaluate;
 mod formula;
@@ -92,7 +94,6 @@ fn main() {
         println!("{:?} :: {:?}", reference, cell);
     }
 
-    println!("Dependencies: {:?}", spreadsheet.dependencies);
     println!(
         "Sorted topologically: {:?}",
         spreadsheet.dependencies.to_topological_sort()
