@@ -104,6 +104,8 @@ fn main() {
     spreadsheet.enter("C2", "=A1+A2+A3");
     spreadsheet.enter("C3", "=A4 + 20");
 
+    spreadsheet.enter("F1", "=AB6001");
+
     for (reference, cell) in &spreadsheet.cells {
         println!("{:?} :: {:?}", reference, cell);
     }
