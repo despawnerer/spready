@@ -26,7 +26,7 @@ use value::{MaybeValue, InvalidValue};
 #[derive(Debug, Default)]
 struct Spreadsheet {
     cells: Sheet,
-    dependencies: DirectedGraph<Reference>,
+    dependencies: DirectedGraph,
 }
 
 impl Spreadsheet {
