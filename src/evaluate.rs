@@ -13,15 +13,8 @@ pub fn evaluate(expr: &Expr, cells: &Sheet) -> MaybeValue {
             None => Ok(Value::Integer(0)),
         },
         Expr::Op(l, op, r) => {
-            let l = match evaluate(l, cells)? {
-                Value::Integer(x) => x,
-                _ => return Err(InvalidValue),
-            };
-
-            let r = match evaluate(r, cells)? {
-                Value::Integer(x) => x,
-                _ => return Err(InvalidValue),
-            };
+            let l = evaluate_expecting_integer(l, cells)?;
+            let r = evaluate_expecting_integer(r, cells)?;
 
             let result = match op {
                 Opcode::Mul => l * r,
@@ -32,5 +25,13 @@ pub fn evaluate(expr: &Expr, cells: &Sheet) -> MaybeValue {
 
             Ok(Value::Integer(result))
         }
+    }
+}
+
+pub fn evaluate_expecting_integer(expr: &Expr, cells: &Sheet) -> Result<i64, InvalidValue> {
+    match evaluate(expr, cells) {
+        Ok(Value::Integer(value)) => Ok(value),
+        Ok(_) => Err(InvalidValue),
+        Err(error) => Err(error),
     }
 }
