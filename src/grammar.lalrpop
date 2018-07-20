@@ -36,4 +36,4 @@ Term: Box<Expr> = {
 };
 
 Int: i64 = r"[0-9]+" => i64::from_str(<>).unwrap();
-Ref: Reference = r"[a-zA-Z]+[0-9]+" => Reference::from_str(<>).unwrap();
+Ref: Reference = r"[a-zA-Z]{1,2}[1-9][0-9]{0,2}" => Reference::from_str(<>).unwrap();
