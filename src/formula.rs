@@ -41,7 +41,8 @@ impl Formula {
                     _find_references_in_expr(l, target);
                     _find_references_in_expr(r, target);
                 }
-                Expr::Integer(_) => {}
+                Expr::Integer(_) => {},
+                Expr::Float(_) => {},
             }
         };
 

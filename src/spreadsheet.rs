@@ -45,9 +45,9 @@ impl Spreadsheet {
                     cell.input = input;
                     cell.formula = Some(formula);
                 }
-                Err(_) => {
+                Err(error) => {
                     let cell = self.get_guaranteed(reference);
-                    cell.value = Err(InvalidValue);
+                    cell.value = Err(error);
                     cell.input = input;
                     cell.formula = None;
                 }
