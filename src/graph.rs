@@ -22,7 +22,11 @@ impl DirectedGraph {
         self._remove_incoming_edge(from_reference, to_reference);
     }
 
-    pub fn set_incoming_edges(&mut self, reference: Reference, new_incoming_edges: HashSet<Reference>) {
+    pub fn set_incoming_edges(
+        &mut self,
+        reference: Reference,
+        new_incoming_edges: HashSet<Reference>,
+    ) {
         let previous_incoming_edges = self.get_or_default_mut(reference).incoming_edges.clone();
 
         for added_edge in new_incoming_edges.difference(&previous_incoming_edges) {

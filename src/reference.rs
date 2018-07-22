@@ -14,7 +14,8 @@ impl FromStr for Reference {
 
     fn from_str(value: &str) -> Result<Reference, InvalidReference> {
         lazy_static! {
-            static ref REFERENCE_REGEX: Regex = Regex::new(r"^[a-zA-Z]{1,2}[1-9][0-9]{0,2}$").unwrap();
+            static ref REFERENCE_REGEX: Regex =
+                Regex::new(r"^[a-zA-Z]{1,2}[1-9][0-9]{0,2}$").unwrap();
         }
 
         if !REFERENCE_REGEX.is_match(value) {

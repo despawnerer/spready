@@ -1,4 +1,4 @@
-use sheet::Sheet;
+use cell::Sheet;
 use syntax::{Expr, Opcode};
 use value::{InvalidValue, MaybeValue, Value};
 
