@@ -5,17 +5,25 @@ use evaluate::evaluate;
 use formula::Formula;
 use graph::DirectedGraph;
 use reference::Reference;
-use value::{InvalidValue, MaybeValue};
+use value::{MaybeValue};
 
 #[derive(Debug, Default)]
 pub struct Spreadsheet {
-    pub cells: Sheet,
-    pub dependencies: DirectedGraph,
+    cells: Sheet,
+    dependencies: DirectedGraph,
 }
 
 impl Spreadsheet {
     pub fn new() -> Spreadsheet {
         Default::default()
+    }
+
+    pub fn cells(&self) -> &Sheet {
+        &self.cells
+    }
+
+    pub fn dependencies(&self) -> &DirectedGraph {
+        &self.dependencies
     }
 
     pub fn get<R: Into<Reference>>(&self, reference: R) -> Option<&Cell> {

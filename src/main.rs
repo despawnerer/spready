@@ -1,21 +1,6 @@
-extern crate lalrpop_util;
-#[macro_use]
-extern crate lazy_static;
-extern crate arrayvec;
-extern crate regex;
+extern crate spready;
 
-mod cell;
-mod evaluate;
-mod formula;
-#[cfg_attr(rustfmt, rustfmt_skip)]
-mod grammar;
-mod graph;
-mod reference;
-mod spreadsheet;
-mod syntax;
-mod value;
-
-use spreadsheet::Spreadsheet;
+use spready::Spreadsheet;
 
 fn main() {
     let mut spreadsheet = Spreadsheet::new();
@@ -40,12 +25,7 @@ fn main() {
     spreadsheet.enter("F1", "=AB6001");
     spreadsheet.enter("F2", "=A1 / 0");
 
-    for (reference, cell) in &spreadsheet.cells {
+    for (reference, cell) in spreadsheet.cells() {
         println!("{:?} :: {:?}", reference, cell);
     }
-
-    println!(
-        "Order of evaluation: {:?}",
-        spreadsheet.dependencies.to_topological_sort()
-    );
 }

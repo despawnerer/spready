@@ -21,7 +21,9 @@ Example
 -------
 
 ```rust
-use spready::spreadsheet::Spreadsheet;
+extern crate spready;
+
+use spready::Spreadsheet;
 
 fn main() {
     let mut spreadsheet = Spreadsheet::new();
@@ -32,17 +34,13 @@ fn main() {
     spreadsheet.enter("B1", "=20");
     spreadsheet.enter("B2", "=30+50");
 
-    spreadsheet.enter("C1", "=A1*2");
-    spreadsheet.enter("C2", "=A1+A2+A3");
-    spreadsheet.enter("C3", "=A4 * 1.5");
+    spreadsheet.enter("C1", "=A1 * 2");
+    spreadsheet.enter("C2", "=A1 + A2 * 1.5");
+    spreadsheet.enter("C3", "=A4 + 20");
 
-    for (reference, cell) in &spreadsheet.cells {
+    for (reference, cell) in spreadsheet.cells() {
         println!("{:?} :: {:?}", reference, cell);
     }
-
-    println!(
-        "Order of evaluation: {:?}",
-        spreadsheet.dependencies.to_topological_sort()
-    );
 }
+
 ```
