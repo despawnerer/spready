@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use std::fmt;
 use std::ops::{Add, Mul, Sub, Div};
 
 #[derive(Debug, Clone)]
@@ -13,6 +14,17 @@ pub enum Value {
 }
 
 pub type MaybeValue = Result<Value, InvalidValue>;
+
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Value::None => write!(f, ""),
+            Value::Integer(value) => write!(f, "{}", value),
+            Value::Float(value) => write!(f, "{}", value),
+            Value::Text(value) => write!(f, "{}", value),
+        }
+    }
+}
 
 impl Add for Value {
     type Output = MaybeValue;

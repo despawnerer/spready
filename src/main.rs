@@ -26,6 +26,6 @@ fn main() {
     spreadsheet.enter("F2", "=A1 / 0");
 
     for (reference, cell) in spreadsheet.cells() {
-        println!("{:?} :: {:?}", reference, cell);
+        println!("{} | {} | {:?}", reference, cell.input, cell.value);
     }
 }

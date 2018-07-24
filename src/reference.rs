@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use std::fmt;
 
 use arrayvec::ArrayString;
 use regex::Regex;
@@ -34,5 +35,11 @@ impl FromStr for Reference {
 impl<'a> From<&'a str> for Reference {
     fn from(src: &'a str) -> Reference {
         src.parse().unwrap()
+    }
+}
+
+impl fmt::Display for Reference {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.0)
     }
 }

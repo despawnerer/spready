@@ -39,7 +39,7 @@ fn main() {
     spreadsheet.enter("C3", "=A4 + 20");
 
     for (reference, cell) in spreadsheet.cells() {
-        println!("{:?} :: {:?}", reference, cell);
+        println!("{} | {} | {:?}", reference, cell.input, cell.value);
     }
 }
 
