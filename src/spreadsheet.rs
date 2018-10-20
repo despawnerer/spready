@@ -1,11 +1,11 @@
 use std::str::FromStr;
 
-use cell::{Cell, Sheet};
+use cell::{Cell, Content, Sheet};
 use evaluate::evaluate;
 use formula::Formula;
 use graph::DirectedGraph;
 use reference::Reference;
-use value::{MaybeValue};
+use value::EvaluationResult;
 
 #[derive(Debug, Default)]
 pub struct Spreadsheet {
@@ -30,41 +30,43 @@ impl Spreadsheet {
         self.cells.get(&reference.into())
     }
 
-    pub fn get_guaranteed<R: Into<Reference>>(&mut self, reference: R) -> &mut Cell {
+    pub fn get_guaranteed_mut<R: Into<Reference>>(&mut self, reference: R) -> &mut Cell {
         self.cells
             .entry(reference.into())
             .or_insert_with(Cell::default)
     }
 
-    pub fn enter<R, T>(&mut self, reference: R, input: T)
+    pub fn enter<R, T>(&mut self, reference: R, text: T)
     where
         R: Into<Reference>,
         T: ToString,
     {
         let reference = reference.into();
-        let input = input.to_string();
+        let text = text.to_string();
 
-        if input.starts_with('=') {
-            match Formula::from_str(&input) {
+        if text.starts_with('=') {
+            match Formula::from_str(&text) {
                 Ok(formula) => {
                     self.dependencies
                         .set_incoming_edges(reference, formula.find_references());
-                    let cell = self.get_guaranteed(reference);
-                    cell.input = input;
-                    cell.formula = Some(formula);
+                    let cell = self.get_guaranteed_mut(reference);
+                    cell.content = Content::Formula {
+                        text: text,
+                        formula: Ok(formula),
+                    };
                 }
                 Err(error) => {
-                    let cell = self.get_guaranteed(reference);
-                    cell.value = Err(error);
-                    cell.input = input;
-                    cell.formula = None;
+                    let cell = self.get_guaranteed_mut(reference);
+                    cell.content = Content::Formula {
+                        text: text,
+                        formula: Err(error),
+                    };
                 }
             }
         } else {
-            let cell = self.get_guaranteed(reference);
-            cell.value = input.parse();
-            cell.input = input;
-            cell.formula = None;
+            let cell = self.get_guaranteed_mut(reference);
+            cell.value = text.parse();
+            cell.content = Content::Text(text);
         }
 
         self.recalculate();
@@ -74,14 +76,14 @@ impl Spreadsheet {
         let order = self.dependencies.to_topological_sort().unwrap();
         for reference in order.iter().cloned() {
             if let Some(value) = self.calculate_cell(reference) {
-                self.get_guaranteed(reference).value = value
+                self.get_guaranteed_mut(reference).value = value
             }
         }
     }
 
-    fn calculate_cell(&self, reference: Reference) -> Option<MaybeValue> {
+    fn calculate_cell(&self, reference: Reference) -> Option<EvaluationResult> {
         self.get(reference)
-            .and_then(|cell| cell.formula.as_ref())
+            .and_then(|cell| cell.formula())
             .map(|formula| evaluate(&formula.expr, &self.cells))
     }
 }

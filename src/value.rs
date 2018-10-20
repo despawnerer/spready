@@ -1,9 +1,5 @@
-use std::str::FromStr;
 use std::fmt;
-use std::ops::{Add, Mul, Sub, Div};
-
-#[derive(Debug, Clone)]
-pub struct InvalidValue;
+use std::str::FromStr;
 
 #[derive(Clone, Debug)]
 pub enum Value {
@@ -13,68 +9,14 @@ pub enum Value {
     Text(String),
 }
 
-pub type MaybeValue = Result<Value, InvalidValue>;
-
-impl fmt::Display for Value {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Value::None => write!(f, ""),
-            Value::Integer(value) => write!(f, "{}", value),
-            Value::Float(value) => write!(f, "{}", value),
-            Value::Text(value) => write!(f, "{}", value),
-        }
-    }
+#[derive(Debug, Clone)]
+pub enum EvaluationError {
+    ParseError,
+    IncompatibleTypes,
+    DivisionByZero,
 }
 
-impl Add for Value {
-    type Output = MaybeValue;
-
-    fn add(self, other: Value) -> MaybeValue {
-        match (self, other) {
-            (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(x + y)),
-            (Value::Float(x), Value::Float(y)) => Ok(Value::Float(x + y)),
-            _ => Err(InvalidValue),
-        }
-    }
-}
-
-impl Sub for Value {
-    type Output = MaybeValue;
-
-    fn sub(self, other: Value) -> MaybeValue {
-        match (self, other) {
-            (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(x - y)),
-            (Value::Float(x), Value::Float(y)) => Ok(Value::Float(x - y)),
-            _ => Err(InvalidValue),
-        }
-    }
-}
-
-impl Mul for Value {
-    type Output = MaybeValue;
-
-    fn mul(self, other: Value) -> MaybeValue {
-        match (self, other) {
-            (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(x * y)),
-            (Value::Float(x), Value::Float(y)) => Ok(Value::Float(x * y)),
-            _ => Err(InvalidValue),
-        }
-    }
-}
-
-impl Div for Value {
-    type Output = MaybeValue;
-
-    fn div(self, other: Value) -> MaybeValue {
-        match (self, other) {
-            (Value::Integer(x), Value::Integer(y)) if y > 0 => Ok(Value::Integer(x / y)),
-            (Value::Integer(_), Value::Integer(y)) if y == 0 => Err(InvalidValue),
-            (Value::Float(x), Value::Float(y)) if y > 0.0 => Ok(Value::Float(x / y)),
-            (Value::Float(_), Value::Float(y)) if y == 0.0 => Err(InvalidValue),
-            _ => Err(InvalidValue),
-        }
-    }
-}
+pub type EvaluationResult = Result<Value, EvaluationError>;
 
 impl Default for Value {
     fn default() -> Value {
@@ -83,9 +25,9 @@ impl Default for Value {
 }
 
 impl FromStr for Value {
-    type Err = InvalidValue;
+    type Err = EvaluationError;
 
-    fn from_str(text: &str) -> Result<Value, InvalidValue> {
+    fn from_str(text: &str) -> Result<Value, EvaluationError> {
         if text.trim().is_empty() {
             Ok(Value::None)
         } else if let Ok(value) = text.parse::<i64>() {
@@ -94,6 +36,17 @@ impl FromStr for Value {
             Ok(Value::Float(value))
         } else {
             Ok(Value::Text(text.to_owned()))
+        }
+    }
+}
+
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Value::None => write!(f, ""),
+            Value::Integer(value) => write!(f, "{}", value),
+            Value::Float(value) => write!(f, "{}", value),
+            Value::Text(value) => write!(f, "{}", value),
         }
     }
 }

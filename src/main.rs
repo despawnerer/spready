@@ -7,7 +7,7 @@ fn main() {
     spreadsheet.enter("A1", 10);
     spreadsheet.enter("A2", 20);
     spreadsheet.enter("A3", 30);
-    spreadsheet.enter("A5", 1.5);
+    spreadsheet.enter("A5", "1.0");
     spreadsheet.enter("A6", 2.5);
 
     spreadsheet.enter("B1", "=20");
@@ -26,6 +26,6 @@ fn main() {
     spreadsheet.enter("F2", "=A1 / 0");
 
     for (reference, cell) in spreadsheet.cells() {
-        println!("{} | {} | {:?}", reference, cell.input, cell.value);
+        println!("{} | {} | {:?}", reference, cell.text(), cell.value);
     }
 }

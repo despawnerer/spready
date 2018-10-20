@@ -15,4 +15,7 @@ mod spreadsheet;
 mod syntax;
 mod value;
 
+pub use cell::Cell;
+pub use reference::Reference;
 pub use spreadsheet::Spreadsheet;
+pub use value::Value;
