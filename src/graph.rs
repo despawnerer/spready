@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-use reference::Reference;
+use crate::reference::Reference;
 
 #[derive(Debug)]
 pub struct GraphHasCycles;

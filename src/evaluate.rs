@@ -1,27 +1,27 @@
-use cell::Sheet;
-use syntax::{Expr, Opcode};
-use value::Value::{Float, Integer};
-use value::{EvaluationError, EvaluationResult, Value};
+use crate::cell::Sheet;
+use crate::parser::{self, BinaryOp, Expr};
+use crate::value::Value::{Float, Integer};
+use crate::value::{EvaluationError, EvaluationResult, Value};
 
 pub fn evaluate(expr: &Expr, cells: &Sheet) -> EvaluationResult {
     match expr {
-        Expr::Integer(x) => Ok(Integer(*x)),
-        Expr::Float(x) => Ok(Float(*x)),
+        Expr::Value(parser::Value::Integer(x)) => Ok(Integer(*x)),
+        Expr::Value(parser::Value::Float(x)) => Ok(Float(*x)),
         Expr::Reference(x) => match cells.get(&x) {
             Some(cell) => cell.value.clone(),
             None => Ok(Value::None),
         },
         Expr::Op(l, op, r) => {
-            let l = evaluate(l, cells)?;
-            let r = evaluate(r, cells)?;
+            let l = evaluate(&l.0, cells)?;
+            let r = evaluate(&r.0, cells)?;
 
             let (l, r) = coerce_types(l, r);
 
             match op {
-                Opcode::Mul => mul(l, r),
-                Opcode::Div => div(l, r),
-                Opcode::Add => add(l, r),
-                Opcode::Sub => sub(l, r),
+                BinaryOp::Mul => mul(l, r),
+                BinaryOp::Div => div(l, r),
+                BinaryOp::Add => add(l, r),
+                BinaryOp::Sub => sub(l, r),
             }
         }
     }

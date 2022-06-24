@@ -8,7 +8,7 @@ use regex::Regex;
 pub struct InvalidReference;
 
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Reference(ArrayString<[u8; 5]>);
+pub struct Reference(ArrayString<5>);
 
 impl FromStr for Reference {
     type Err = InvalidReference;

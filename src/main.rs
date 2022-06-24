@@ -12,6 +12,7 @@ fn main() {
 
     spreadsheet.enter("B1", "=20");
     spreadsheet.enter("B2", "=30+50");
+    spreadsheet.enter("B3", "=20.5");
 
     spreadsheet.enter("C1", "=A1*2");
     spreadsheet.enter("C2", "=A1+A2+A3");
