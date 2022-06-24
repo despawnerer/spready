@@ -8,7 +8,7 @@ use crate::value::EvaluationResult;
 #[derive(Debug, Default)]
 pub struct Spreadsheet {
     cells: Sheet,
-    dependencies: DirectedGraph,
+    dependencies: DirectedGraph<Reference>,
 }
 
 impl Spreadsheet {
@@ -20,7 +20,7 @@ impl Spreadsheet {
         &self.cells
     }
 
-    pub fn dependencies(&self) -> &DirectedGraph {
+    pub fn dependencies(&self) -> &DirectedGraph<Reference> {
         &self.dependencies
     }
 

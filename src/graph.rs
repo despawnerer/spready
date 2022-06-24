@@ -1,31 +1,38 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
-
-use crate::reference::Reference;
+use std::hash::Hash;
 
 #[derive(Debug)]
 pub struct GraphHasCycles;
 
-#[derive(Debug, Clone, Default)]
-pub struct DirectedGraph {
-    nodes: HashMap<Reference, Node>,
+#[derive(Debug, Clone)]
+pub struct DirectedGraph<R> where R: Hash + Eq + Clone + Copy {
+    nodes: HashMap<R, Node<R>>,
 }
 
-impl DirectedGraph {
-    pub fn add_edge(&mut self, from_reference: Reference, to_reference: Reference) {
+impl<R> Default for DirectedGraph<R> where R: Hash + Eq + Clone+ Copy {
+    fn default() -> Self {
+        DirectedGraph {
+            nodes: HashMap::new()
+        }
+    }
+}
+
+impl<R> DirectedGraph<R> where R: Hash + Eq + Clone + Copy {
+    pub fn add_edge(&mut self, from_reference: R, to_reference: R) {
         self._add_outgoing_edge(from_reference, to_reference);
         self._add_incoming_edge(from_reference, to_reference);
     }
 
-    pub fn remove_edge(&mut self, from_reference: Reference, to_reference: Reference) {
+    pub fn remove_edge(&mut self, from_reference: R, to_reference: R) {
         self._remove_outgoing_edge(from_reference, to_reference);
         self._remove_incoming_edge(from_reference, to_reference);
     }
 
     pub fn set_incoming_edges(
         &mut self,
-        reference: Reference,
-        new_incoming_edges: HashSet<Reference>,
+        reference: R,
+        new_incoming_edges: HashSet<R>,
     ) {
         let previous_incoming_edges = self.get_or_default_mut(reference).incoming_edges.clone();
 
@@ -46,7 +53,7 @@ impl DirectedGraph {
             .any(|n| n.has_incoming_edges() || n.has_outgoing_edges())
     }
 
-    pub fn to_topological_sort(&self) -> Result<Vec<Reference>, GraphHasCycles> {
+    pub fn to_topological_sort(&self) -> Result<Vec<R>, GraphHasCycles> {
         let mut graph = self.clone();
 
         let mut sorted_references = Vec::new();
@@ -72,19 +79,19 @@ impl DirectedGraph {
         }
     }
 
-    fn get(&self, reference: Reference) -> Option<&Node> {
+    fn get(&self, reference: R) -> Option<&Node<R>> {
         self.nodes.get(&reference)
     }
 
-    fn get_mut(&mut self, reference: Reference) -> Option<&mut Node> {
+    fn get_mut(&mut self, reference: R) -> Option<&mut Node<R>> {
         self.nodes.get_mut(&reference)
     }
 
-    fn get_or_default_mut(&mut self, reference: Reference) -> &mut Node {
+    fn get_or_default_mut(&mut self, reference: R) -> &mut Node<R> {
         self.nodes.entry(reference).or_insert_with(Node::default)
     }
 
-    fn get_references_with_no_incoming_edges(&self) -> Vec<Reference> {
+    fn get_references_with_no_incoming_edges(&self) -> Vec<R> {
         self.nodes
             .iter()
             .filter(|(_, n)| !n.has_incoming_edges())
@@ -94,38 +101,48 @@ impl DirectedGraph {
 
     // WARNING: these do not maintain the invariant of both relationships being correctly updated
 
-    fn _add_outgoing_edge(&mut self, from_reference: Reference, to_reference: Reference) {
+    fn _add_outgoing_edge(&mut self, from_reference: R, to_reference: R) {
         self.get_or_default_mut(from_reference)
             .outgoing_edges
             .insert(to_reference);
     }
 
-    fn _remove_outgoing_edge(&mut self, from_reference: Reference, to_reference: Reference) {
+    fn _remove_outgoing_edge(&mut self, from_reference: R, to_reference: R) {
         if let Some(node) = self.get_mut(from_reference) {
             node.outgoing_edges.remove(&to_reference);
         }
     }
 
-    fn _add_incoming_edge(&mut self, from_reference: Reference, to_reference: Reference) {
+    fn _add_incoming_edge(&mut self, from_reference: R, to_reference: R) {
         self.get_or_default_mut(to_reference)
             .incoming_edges
             .insert(from_reference);
     }
 
-    fn _remove_incoming_edge(&mut self, from_reference: Reference, to_reference: Reference) {
+    fn _remove_incoming_edge(&mut self, from_reference: R, to_reference: R) {
         if let Some(node) = self.get_mut(to_reference) {
             node.incoming_edges.remove(&from_reference);
         }
     }
 }
 
-#[derive(Debug, Clone, Default)]
-struct Node {
-    outgoing_edges: HashSet<Reference>,
-    incoming_edges: HashSet<Reference>,
+#[derive(Debug, Clone)]
+struct Node<R> where R: Hash + Eq + Clone {
+    outgoing_edges: HashSet<R>,
+    incoming_edges: HashSet<R>,
 }
 
-impl Node {
+
+impl<R> Default for Node<R> where R: Hash + Eq + Clone{
+    fn default() -> Self {
+        Node {
+            outgoing_edges: HashSet::new(),
+            incoming_edges: HashSet::new()
+        }
+    }
+}
+
+impl<R> Node<R> where R: Hash + Eq + Clone {
     fn has_incoming_edges(&self) -> bool {
         !self.incoming_edges.is_empty()
     }
