@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::formula::Formula;
+use crate::formula::Expr;
 use crate::reference::Reference;
 use crate::value::{EvaluationError, EvaluationResult, Value};
 
@@ -17,7 +17,7 @@ pub enum Content {
     Text(String),
     Formula {
         text: String,
-        formula: Result<Formula, EvaluationError>,
+        formula: Result<Expr, EvaluationError>,
     },
 }
 
@@ -32,7 +32,7 @@ impl Cell {
         }
     }
 
-    pub fn formula(&self) -> Option<&Formula> {
+    pub fn formula(&self) -> Option<&Expr> {
         match self.content {
             Content::Formula {
                 text: _,

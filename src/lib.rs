@@ -5,13 +5,18 @@ extern crate regex;
 
 mod cell;
 mod evaluate;
-mod formula;
 mod graph;
-mod lexer;
-mod parser;
 mod reference;
 mod spreadsheet;
 mod value;
+mod formula {
+    mod ast;
+    mod lexer;
+    mod parser;
+
+    pub use ast::{BinaryOp, Expr};
+    pub use parser::parse_formula;
+}
 
 pub use cell::Cell;
 pub use reference::Reference;

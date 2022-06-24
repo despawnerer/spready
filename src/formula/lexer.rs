@@ -1,6 +1,8 @@
+use std::ops::Range;
+
 use chumsky::prelude::*;
 
-pub type Span = std::ops::Range<usize>;
+pub type Span = Range<usize>;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Token {

@@ -1,8 +1,6 @@
-use std::str::FromStr;
-
 use crate::cell::{Cell, Content, Sheet};
 use crate::evaluate::evaluate;
-use crate::formula::Formula;
+use crate::formula::parse_formula;
 use crate::graph::DirectedGraph;
 use crate::reference::Reference;
 use crate::value::EvaluationResult;
@@ -45,7 +43,7 @@ impl Spreadsheet {
         let text = text.to_string();
 
         if text.starts_with('=') {
-            match Formula::from_str(&text) {
+            match parse_formula(&text) {
                 Ok(formula) => {
                     self.dependencies
                         .set_incoming_edges(reference, formula.find_references());
@@ -84,6 +82,6 @@ impl Spreadsheet {
     fn calculate_cell(&self, reference: Reference) -> Option<EvaluationResult> {
         self.get(reference)
             .and_then(|cell| cell.formula())
-            .map(|formula| evaluate(&formula.expr, &self.cells))
+            .map(|expr| evaluate(expr, &self.cells))
     }
 }

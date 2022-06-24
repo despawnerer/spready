@@ -1,37 +1,30 @@
 use chumsky::prelude::*;
+use chumsky::stream::Stream;
 
-use crate::lexer::{Span, Token};
-use crate::reference::Reference;
+use crate::value::EvaluationError;
 
-pub type Spanned<T> = (T, Span);
+use super::ast::{BinaryOp, Expr, Spanned};
+use super::lexer::{lexer, Token};
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum Value {
-    Integer(i64),
-    Float(f64),
+pub fn parse_formula(input: &str) -> Result<Expr, EvaluationError> {
+    let len = input.chars().count();
+
+    let tokens = lexer()
+        .parse(input)
+        .map_err(|e| EvaluationError::ParseError)?;
+
+    expr_parser()
+        .parse(Stream::from_iter(len..len + 1, tokens.into_iter()))
+        .map_err(|_| EvaluationError::ParseError)
+        .map(|expr| expr.0) // discard the span
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub enum BinaryOp {
-    Mul,
-    Div,
-    Add,
-    Sub,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub enum Expr {
-    Value(Value),
-    Reference(Reference),
-    Op(Box<Spanned<Self>>, BinaryOp, Box<Spanned<Self>>),
-}
-
-pub fn expr_parser() -> impl Parser<Token, Spanned<Expr>, Error = Simple<Token>> + Clone {
+fn expr_parser() -> impl Parser<Token, Spanned<Expr>, Error = Simple<Token>> + Clone {
     recursive(
         |expr: Recursive<Token, (Expr, std::ops::Range<usize>), Simple<Token>>| {
             let val = select! {
-                Token::Integer(n) => Expr::Value(Value::Integer(n.parse().unwrap())),
-                Token::Float(s) => Expr::Value(Value::Float(s.parse().unwrap())),
+                Token::Integer(n) => Expr::Integer(n.parse().unwrap()),
+                Token::Float(s) => Expr::Float(s.parse().unwrap()),
             }
             .labelled("value");
 
