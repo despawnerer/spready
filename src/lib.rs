@@ -1,8 +1,3 @@
-#[macro_use]
-extern crate lazy_static;
-extern crate arrayvec;
-extern crate regex;
-
 mod cell;
 mod evaluate;
 mod graph;

@@ -6,19 +6,28 @@ use std::hash::Hash;
 pub struct GraphHasCycles;
 
 #[derive(Debug, Clone)]
-pub struct DirectedGraph<R> where R: Hash + Eq + Clone + Copy {
+pub struct DirectedGraph<R>
+where
+    R: Hash + Eq + Clone + Copy,
+{
     nodes: HashMap<R, Node<R>>,
 }
 
-impl<R> Default for DirectedGraph<R> where R: Hash + Eq + Clone+ Copy {
+impl<R> Default for DirectedGraph<R>
+where
+    R: Hash + Eq + Clone + Copy,
+{
     fn default() -> Self {
         DirectedGraph {
-            nodes: HashMap::new()
+            nodes: HashMap::new(),
         }
     }
 }
 
-impl<R> DirectedGraph<R> where R: Hash + Eq + Clone + Copy {
+impl<R> DirectedGraph<R>
+where
+    R: Hash + Eq + Clone + Copy,
+{
     pub fn add_edge(&mut self, from_reference: R, to_reference: R) {
         self._add_outgoing_edge(from_reference, to_reference);
         self._add_incoming_edge(from_reference, to_reference);
@@ -29,11 +38,7 @@ impl<R> DirectedGraph<R> where R: Hash + Eq + Clone + Copy {
         self._remove_incoming_edge(from_reference, to_reference);
     }
 
-    pub fn set_incoming_edges(
-        &mut self,
-        reference: R,
-        new_incoming_edges: HashSet<R>,
-    ) {
+    pub fn set_incoming_edges(&mut self, reference: R, new_incoming_edges: HashSet<R>) {
         let previous_incoming_edges = self.get_or_default_mut(reference).incoming_edges.clone();
 
         for added_edge in new_incoming_edges.difference(&previous_incoming_edges) {
@@ -127,22 +132,30 @@ impl<R> DirectedGraph<R> where R: Hash + Eq + Clone + Copy {
 }
 
 #[derive(Debug, Clone)]
-struct Node<R> where R: Hash + Eq + Clone {
+struct Node<R>
+where
+    R: Hash + Eq + Clone,
+{
     outgoing_edges: HashSet<R>,
     incoming_edges: HashSet<R>,
 }
 
-
-impl<R> Default for Node<R> where R: Hash + Eq + Clone{
+impl<R> Default for Node<R>
+where
+    R: Hash + Eq + Clone,
+{
     fn default() -> Self {
         Node {
             outgoing_edges: HashSet::new(),
-            incoming_edges: HashSet::new()
+            incoming_edges: HashSet::new(),
         }
     }
 }
 
-impl<R> Node<R> where R: Hash + Eq + Clone {
+impl<R> Node<R>
+where
+    R: Hash + Eq + Clone,
+{
     fn has_incoming_edges(&self) -> bool {
         !self.incoming_edges.is_empty()
     }
